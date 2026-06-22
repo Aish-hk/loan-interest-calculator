@@ -63,9 +63,10 @@ only way a state or value is communicated.
 - **Rate preview:** live `base + margin` value before submission.
 - **Interest summary:** total first, then repayment composition and assumptions.
 - **Accrual table:** paginated in 100-row pages; rounded rows reconcile exactly.
-- **Calculation history:** session-scoped records that reopen and update in place.
-- **Empty/loading/error states:** describe the next action and degrade safely if
-  browser storage is unavailable.
+- **Calculation history:** page-lifetime records that can be reopened; changed
+  edits create a linked new version while preserving the previous entry.
+- **Empty/loading/error states:** describe the next action and keep the primary
+  calculation workflow understandable.
 
 ## Interaction and accessibility
 
@@ -78,6 +79,6 @@ only way a state or value is communicated.
 
 ## Content style
 
-Use direct labels such as “Calculate interest”, “Save changes” and “Edit”.
+Use direct labels such as “Calculate interest”, “Update calculation” and “Edit”.
 State financial conventions plainly and never imply an estimate is an offer or
 financial advice.

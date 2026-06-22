@@ -1,10 +1,6 @@
 flowchart TD
-    start([Open loan calculator]) --> defaults[Load default one-year £10,000 example]
-    defaults --> historyLoad{Session history available?}
-    historyLoad -->|Yes| restore[Restore saved calculations]
-    historyLoad -->|No or storage unavailable| memory[Continue with in-memory history]
-    restore --> form
-    memory --> form
+    start([Open loan calculator]) --> empty[Show empty loan form and result placeholder]
+    empty --> form
 
     subgraph input["Loan details"]
         form[Review or edit loan inputs]
@@ -41,21 +37,20 @@ flowchart TD
     schedule --> longTerm{More than 100 daily records?}
     longTerm -->|Yes| pagination[Use Previous and Next pagination]
     longTerm -->|No| historySave
-    pagination --> historySave[Create session-history record]
-
-    historySave --> storageSave{Can session storage be written?}
-    storageSave -->|Yes| persisted[Persist history for this browser-tab session]
-    storageSave -->|No| fallback[Keep history in memory]
-    persisted --> nextAction
-    fallback --> nextAction
+    pagination --> historySave[Create in-memory history record]
+    historySave --> nextAction
 
     nextAction{What does the user do next?}
     nextAction -->|Edit a record| edit[Load selected calculation into form]
-    edit --> save[Select Save changes]
-    save --> validate
-    nextAction -->|New calculation| reset[Reset to demonstration values]
+    edit --> update[Select Update calculation]
+    update --> changed{Did an input change?}
+    changed -->|Yes| version[Create linked updated version and preserve original]
+    changed -->|No| current[Reuse opened record without a duplicate]
+    version --> result
+    current --> result
+    nextAction -->|New calculation| reset[Clear form and active result]
     reset --> form
-    nextAction -->|Refresh tab| historyLoad
+    nextAction -->|Refresh tab| empty
     nextAction -->|Finish| finish([Calculation complete])
 
     subgraph deployment["Deployment"]
@@ -70,7 +65,7 @@ flowchart TD
     classDef decision fill:#f1f2ff,stroke:#494fdf,color:#191c1f;
     classDef neutral fill:#f4f4f4,stroke:#505a63,color:#191c1f;
 
-    class defaults,restore,memory,calculate,round,result,schedule,pagination,historySave,persisted,fallback,finish,publish happy;
+    class empty,calculate,round,result,schedule,pagination,historySave,version,current,finish,publish happy;
     class dateError,rangeError,termError,amountError,currencyError,rateError,announce error;
-    class historyLoad,validate,identify,longTerm,storageSave,nextAction decision;
-    class form,dates,principal,rates,preview,submit,edit,save,reset,localChecks,push,cloudflare neutral;
+    class validate,identify,longTerm,nextAction,changed decision;
+    class form,dates,principal,rates,preview,submit,edit,update,reset,localChecks,push,cloudflare neutral;

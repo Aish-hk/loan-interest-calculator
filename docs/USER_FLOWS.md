@@ -8,12 +8,8 @@ GitHub renders the diagram below directly from Mermaid syntax.
 
 ```mermaid
 flowchart TD
-    start([Open loan calculator]) --> defaults[Load default one-year £10,000 example]
-    defaults --> historyLoad{Session history available?}
-    historyLoad -->|Yes| restore[Restore saved calculations]
-    historyLoad -->|No or unavailable| memory[Continue with in-memory history]
-    restore --> form
-    memory --> form
+    start([Open loan calculator]) --> empty[Show empty loan form and result placeholder]
+    empty --> form
 
     form[Review or edit loan inputs] --> submit[Select Calculate interest]
     submit --> validate{Are all inputs valid?}
@@ -36,36 +32,36 @@ flowchart TD
     result --> schedule[Show reconciled daily accrual schedule]
     schedule --> longTerm{More than 100 records?}
     longTerm -->|Yes| pagination[Enable schedule pagination]
-    longTerm -->|No| historySave[Create session-history record]
+    longTerm -->|No| historySave[Create in-memory history record]
     pagination --> historySave
 
-    historySave --> storage{Session storage available?}
-    storage -->|Yes| persisted[Persist history for this tab]
-    storage -->|No| fallback[Keep history in memory]
-    persisted --> nextAction{Next action?}
-    fallback --> nextAction
+    historySave --> nextAction{Next action?}
 
     nextAction -->|Edit| edit[Load record into form]
-    edit --> save[Save changes to the same record]
-    save --> validate
-    nextAction -->|New calculation| reset[Reset demonstration values]
+    edit --> update[Select Update calculation]
+    update --> changed{Did an input change?}
+    changed -->|Yes| version[Create linked updated version and preserve original]
+    changed -->|No| current[Reuse the opened record without a duplicate]
+    version --> result
+    current --> result
+    nextAction -->|New calculation| reset[Clear the form and active result]
     reset --> form
-    nextAction -->|Refresh| historyLoad
+    nextAction -->|Refresh| empty
     nextAction -->|Finish| finish([Calculation complete])
 
     classDef happy fill:#e8f7f2,stroke:#00a87e,color:#191c1f;
     classDef error fill:#fff0f1,stroke:#e23b4a,color:#191c1f;
     classDef decision fill:#f1f2ff,stroke:#494fdf,color:#191c1f;
 
-    class defaults,restore,memory,calculate,result,schedule,pagination,historySave,persisted,fallback,finish happy;
+    class empty,calculate,result,schedule,pagination,historySave,version,current,finish happy;
     class dateError,termError,amountError,currencyError,rateError,announce error;
-    class historyLoad,validate,identify,longTerm,storage,nextAction decision;
+    class validate,identify,longTerm,nextAction,changed decision;
 ```
 
 ## 1. First visit and simple calculation
 
-1. The calculator opens with a one-year, £10,000 example.
-2. The user reviews or changes dates, principal, currency, base rate and margin.
+1. The calculator opens with an empty form and a result placeholder.
+2. The user enters dates, principal, currency, base rate and margin.
 3. Total annual rate updates immediately.
 4. The user selects **Calculate interest**.
 5. Focus moves to the result.
@@ -73,7 +69,7 @@ flowchart TD
    and assumptions.
 7. The daily accrual schedule appears below, starting on the loan start date and
    ending the day before the end date.
-8. A new record is added to session history.
+8. A new record is added to in-memory history for the current page lifetime.
 
 ## 2. Validation and recovery
 
@@ -112,17 +108,18 @@ technology.
 5. Record counts and the visible range update on each page.
 6. Long loans do not allocate the entire schedule in memory.
 
-## 5. History and edit-in-place
+## 5. History and versioned editing
 
 1. A successful calculation creates a history record.
 2. **Edit** loads that record into the form and scrolls to it.
-3. The form changes to **Edit calculation** and **Save changes**.
-4. Saving updates the same record rather than creating a duplicate.
-5. Created time is retained and a last-updated time is added.
-6. **New calculation** resets to the default demonstration values.
-7. History survives refresh in the same tab through session storage.
-8. If browser storage is blocked or corrupt, calculation still works with
-   in-memory history.
+3. The form changes to **Edit calculation** and **Update calculation**.
+4. Updating changed values creates a new linked version and preserves the
+   original record.
+5. The new version receives its own identifier and an updated timestamp.
+6. Submitting without changing any inputs reuses the opened record and does not
+   create a duplicate.
+7. **New calculation** clears the form and active result.
+8. History is held only in React memory and is cleared by a page refresh.
 
 ## 6. Currency and rounding
 

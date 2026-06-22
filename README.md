@@ -71,13 +71,13 @@ which avoids placing the entire rounding remainder on the final day.
 - Daily results use a bounded, horizontally scrollable and paginated table.
 - Loan dates use accessible segmented fields and a calendar with month/year
   navigation, keyboard controls and bounded selectable dates.
-- History uses `sessionStorage`, so it survives refreshes in the same tab and is
-  cleared when that browser-tab session ends.
+- History is held in React memory for the current page lifetime. Refreshing or
+  closing the page clears it; browser or server persistence is not implemented.
 - History prioritises principal, period, total rate, duration and total
-  interest. Selecting Edit loads that record into the form. Saving changed
-  values creates a clearly labelled updated entry while preserving the previous
-  version; unchanged values do not create a duplicate. New calculation creates
-  an unrelated record.
+  interest. Selecting Edit loads that record into the form. Updating changed
+  values creates a clearly labelled new version while preserving the previous
+  entry; submitting unchanged values does not create a duplicate. New
+  calculation clears the form and starts an unrelated record.
 
 ## Possible production extensions
 
