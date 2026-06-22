@@ -43,3 +43,9 @@ CLAUDE.md
 *.scratch.*
 notes.md
 scratch/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
