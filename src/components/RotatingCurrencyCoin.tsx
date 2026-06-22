@@ -7,7 +7,7 @@ const currencySymbols: Record<Currency, string> = {
   USD: "$",
 };
 
-const slabCount = 60;
+const slabCount = 144;
 const coinSize = 280;
 const thickness = 22;
 const radius = coinSize / 2;

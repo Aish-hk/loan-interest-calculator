@@ -6,7 +6,8 @@ calculations created during the current browser session.
 
 ## Live
 
-The production application is deployed through Cloudflare Pages.
+The production application is available at
+[loan-interest-calculator.aishu-kshirsagar496.workers.dev](https://loan-interest-calculator.aishu-kshirsagar496.workers.dev).
 
 ## Run locally
 
@@ -73,9 +74,9 @@ which avoids placing the entire rounding remainder on the final day.
 - History uses `sessionStorage`, so it survives refreshes in the same tab and is
   cleared when that browser-tab session ends.
 - History prioritises principal, period, total rate, duration and total
-  interest. A direct calculation creates a new record. Opening a history record
-  and recalculating updates that same record, preserving its Created timestamp
-  and adding an Updated timestamp.
+  interest. Selecting Edit copies a record’s values into the form. A changed
+  scenario is saved as a separate entry; submitting identical values does not
+  create a duplicate or overwrite the original.
 
 ## Possible production extensions
 

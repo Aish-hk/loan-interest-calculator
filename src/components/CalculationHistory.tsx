@@ -92,10 +92,7 @@ export function CalculationHistory({
                   </div>
                 </div>
                 <small className="history-timestamp">
-                  {calculation.updatedAt ? "Last updated" : "Created"}{" "}
-                  {formatDateTime(
-                    calculation.updatedAt ?? calculation.createdAt,
-                  )}
+                  Created {formatDateTime(calculation.createdAt)}
                 </small>
               </dl>
               {calculation.id !== openedId && (

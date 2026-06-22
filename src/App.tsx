@@ -57,22 +57,21 @@ function App() {
     const openedCalculation = calculations.find(
       (item) => item.id === openedId,
     );
-    const result = openedCalculation
-      ? {
-          ...calculateLoan(
-            input,
-            openedCalculation.id,
-            openedCalculation.createdAt,
-          ),
-          updatedAt: new Date().toISOString(),
-        }
-      : calculateLoan(input);
+    const hasChanges =
+      !openedCalculation ||
+      openedCalculation.startDate !== input.startDate ||
+      openedCalculation.endDate !== input.endDate ||
+      openedCalculation.amount !== input.amount ||
+      openedCalculation.currency !== input.currency ||
+      openedCalculation.baseRate !== input.baseRate ||
+      openedCalculation.margin !== input.margin;
+    const result = hasChanges
+      ? calculateLoan(input)
+      : openedCalculation;
 
-    setCalculations((current) =>
-      openedCalculation
-        ? current.map((item) => (item.id === openedId ? result : item))
-        : [result, ...current],
-    );
+    if (hasChanges) {
+      setCalculations((current) => [result, ...current]);
+    }
     setActive(result);
     setOpenedId(undefined);
     setAnimationRun((current) => current + 1);
