@@ -102,5 +102,5 @@ Cloudflare Pages deploys the application from `main`. Use:
 - Build output directory: `dist`
 - Node version: 22
 
-GitHub Actions independently runs tests and a production build on pushes and
-pull requests. Cloudflare remains the only deployment target.
+Run `npm test` and `npm run build` locally before pushing changes. Cloudflare
+remains the only deployment target.

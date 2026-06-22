@@ -82,7 +82,7 @@ technology.
 
 ## 8. Deployment flow
 
-1. A push to `main` triggers GitHub quality checks and a Cloudflare deployment.
-2. GitHub Actions runs `npm ci`, tests and the production build.
+1. Tests and the production build are run locally before changes are pushed.
+2. A push to `main` triggers the connected Cloudflare deployment.
 3. Cloudflare Pages builds with `npm run build` and publishes `dist`.
 4. Relative production asset paths work on the deployed Cloudflare site.
