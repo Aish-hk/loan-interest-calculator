@@ -1,0 +1,76 @@
+flowchart TD
+    start([Open loan calculator]) --> defaults[Load default one-year £10,000 example]
+    defaults --> historyLoad{Session history available?}
+    historyLoad -->|Yes| restore[Restore saved calculations]
+    historyLoad -->|No or storage unavailable| memory[Continue with in-memory history]
+    restore --> form
+    memory --> form
+
+    subgraph input["Loan details"]
+        form[Review or edit loan inputs]
+        form --> dates[Choose start and end dates]
+        dates --> principal[Enter amount and currency]
+        principal --> rates[Enter base rate and margin]
+        rates --> preview[Review live total annual rate]
+    end
+
+    preview --> submit[Select Calculate interest]
+    submit --> validate{Are all inputs valid?}
+
+    subgraph errors["Validation and recovery"]
+        validate -->|No| identify{Which rule failed?}
+        identify -->|Missing date| dateError[Explain which date is required]
+        identify -->|End not after start| rangeError[Require a later end date]
+        identify -->|Term over 50 years| termError[Explain processing limit]
+        identify -->|Invalid amount| amountError[Require amount above zero and within limit]
+        identify -->|Missing currency| currencyError[Require GBP, USD or EUR]
+        identify -->|Invalid rate or margin| rateError[Require value from 0% to 100%]
+        dateError --> announce[Associate and announce inline error]
+        rangeError --> announce
+        termError --> announce
+        amountError --> announce
+        currencyError --> announce
+        rateError --> announce
+        announce --> form
+    end
+
+    validate -->|Yes| calculate[Calculate simple interest using Actual/365]
+    calculate --> round[Allocate daily values using cumulative currency rounding]
+    round --> result[Move focus to interest summary]
+    result --> schedule[Show daily accrual schedule]
+    schedule --> longTerm{More than 100 daily records?}
+    longTerm -->|Yes| pagination[Use Previous and Next pagination]
+    longTerm -->|No| historySave
+    pagination --> historySave[Create session-history record]
+
+    historySave --> storageSave{Can session storage be written?}
+    storageSave -->|Yes| persisted[Persist history for this browser-tab session]
+    storageSave -->|No| fallback[Keep history in memory]
+    persisted --> nextAction
+    fallback --> nextAction
+
+    nextAction{What does the user do next?}
+    nextAction -->|Edit a record| edit[Load selected calculation into form]
+    edit --> save[Select Save changes]
+    save --> validate
+    nextAction -->|New calculation| reset[Reset to demonstration values]
+    reset --> form
+    nextAction -->|Refresh tab| historyLoad
+    nextAction -->|Finish| finish([Calculation complete])
+
+    subgraph deployment["Deployment"]
+        localChecks[Run tests and production build locally]
+        localChecks --> push[Push main to GitHub]
+        push --> cloudflare[Cloudflare builds with npm run build]
+        cloudflare --> publish[Publish dist]
+    end
+
+    classDef happy fill:#e8f7f2,stroke:#00a87e,color:#191c1f;
+    classDef error fill:#fff0f1,stroke:#e23b4a,color:#191c1f;
+    classDef decision fill:#f1f2ff,stroke:#494fdf,color:#191c1f;
+    classDef neutral fill:#f4f4f4,stroke:#505a63,color:#191c1f;
+
+    class defaults,restore,memory,calculate,round,result,schedule,pagination,historySave,persisted,fallback,finish,publish happy;
+    class dateError,rangeError,termError,amountError,currencyError,rateError,announce error;
+    class historyLoad,validate,identify,longTerm,storageSave,nextAction decision;
+    class form,dates,principal,rates,preview,submit,edit,save,reset,localChecks,push,cloudflare neutral;

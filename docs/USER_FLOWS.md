@@ -1,5 +1,67 @@
 # User Flows and Acceptance Criteria
 
+## End-to-end flow diagram
+
+The source file is
+[`docs/user-flows/loan-calculator-flow.mmd`](user-flows/loan-calculator-flow.mmd).
+GitHub renders the diagram below directly from Mermaid syntax.
+
+```mermaid
+flowchart TD
+    start([Open loan calculator]) --> defaults[Load default one-year £10,000 example]
+    defaults --> historyLoad{Session history available?}
+    historyLoad -->|Yes| restore[Restore saved calculations]
+    historyLoad -->|No or unavailable| memory[Continue with in-memory history]
+    restore --> form
+    memory --> form
+
+    form[Review or edit loan inputs] --> submit[Select Calculate interest]
+    submit --> validate{Are all inputs valid?}
+
+    validate -->|No| identify{Which rule failed?}
+    identify -->|Dates| dateError[Show date or range error]
+    identify -->|Term| termError[Explain 50-year limit]
+    identify -->|Amount| amountError[Explain supported amount]
+    identify -->|Currency| currencyError[Require supported currency]
+    identify -->|Rates| rateError[Require rates from 0% to 100%]
+    dateError --> announce[Associate and announce inline error]
+    termError --> announce
+    amountError --> announce
+    currencyError --> announce
+    rateError --> announce
+    announce --> form
+
+    validate -->|Yes| calculate[Calculate simple interest using Actual/365]
+    calculate --> result[Show summary and move focus to result]
+    result --> schedule[Show reconciled daily accrual schedule]
+    schedule --> longTerm{More than 100 records?}
+    longTerm -->|Yes| pagination[Enable schedule pagination]
+    longTerm -->|No| historySave[Create session-history record]
+    pagination --> historySave
+
+    historySave --> storage{Session storage available?}
+    storage -->|Yes| persisted[Persist history for this tab]
+    storage -->|No| fallback[Keep history in memory]
+    persisted --> nextAction{Next action?}
+    fallback --> nextAction
+
+    nextAction -->|Edit| edit[Load record into form]
+    edit --> save[Save changes to the same record]
+    save --> validate
+    nextAction -->|New calculation| reset[Reset demonstration values]
+    reset --> form
+    nextAction -->|Refresh| historyLoad
+    nextAction -->|Finish| finish([Calculation complete])
+
+    classDef happy fill:#e8f7f2,stroke:#00a87e,color:#191c1f;
+    classDef error fill:#fff0f1,stroke:#e23b4a,color:#191c1f;
+    classDef decision fill:#f1f2ff,stroke:#494fdf,color:#191c1f;
+
+    class defaults,restore,memory,calculate,result,schedule,pagination,historySave,persisted,fallback,finish happy;
+    class dateError,termError,amountError,currencyError,rateError,announce error;
+    class historyLoad,validate,identify,longTerm,storage,nextAction decision;
+```
+
 ## 1. First visit and simple calculation
 
 1. The calculator opens with a one-year, £10,000 example.
