@@ -82,8 +82,7 @@ technology.
 
 ## 8. Deployment flow
 
-1. A push to `main` runs `npm ci`, tests and the production build.
-2. A successful workflow publishes `dist` to GitHub Pages.
-3. Cloudflare Pages can import the same repository with `npm run build` and
-   output directory `dist`.
-4. Relative production asset paths work on both hosts.
+1. A push to `main` triggers GitHub quality checks and a Cloudflare deployment.
+2. GitHub Actions runs `npm ci`, tests and the production build.
+3. Cloudflare Pages builds with `npm run build` and publishes `dist`.
+4. Relative production asset paths work on the deployed Cloudflare site.

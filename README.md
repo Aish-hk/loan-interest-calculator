@@ -6,9 +6,7 @@ calculations created during the current browser session.
 
 ## Live
 
-- GitHub Pages: `https://aish-hk.github.io/loan-interest-calculator/`
-- Cloudflare Pages: connect this repository with build command `npm run build`
-  and output directory `dist`
+The production application is deployed through Cloudflare Pages.
 
 ## Run locally
 
@@ -97,13 +95,12 @@ End-to-end happy paths, validation, edge cases and acceptance criteria are in
 
 ## Deployment
 
-Pushing `main` runs tests, builds the production bundle and deploys it through
-the included GitHub Pages workflow. In repository settings, set
-**Pages → Build and deployment → Source** to **GitHub Actions**.
-
-For Cloudflare Pages, import the same GitHub repository and use:
+Cloudflare Pages deploys the application from `main`. Use:
 
 - Framework preset: Vite
 - Build command: `npm run build`
 - Build output directory: `dist`
 - Node version: 22
+
+GitHub Actions independently runs tests and a production build on pushes and
+pull requests. Cloudflare remains the only deployment target.
