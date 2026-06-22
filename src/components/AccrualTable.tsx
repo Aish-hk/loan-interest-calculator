@@ -93,7 +93,8 @@ export function AccrualTable({ calculation }: AccrualTableProps) {
                 <span className="column-heading numeric-heading">
                   Daily interest
                   <InfoTip label="Daily interest">
-                    Interest for the day using the base rate plus margin.
+                    Interest for the day using the base rate plus margin,
+                    allocated to two decimals.
                   </InfoTip>
                 </span>
               </th>
@@ -101,7 +102,7 @@ export function AccrualTable({ calculation }: AccrualTableProps) {
                 <span className="column-heading numeric-heading">
                   Accrued interest
                   <InfoTip label="Accrued interest">
-                    Total interest accumulated up to this date.
+                    Rounded cumulative interest accumulated up to this date.
                   </InfoTip>
                 </span>
               </th>

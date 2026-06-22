@@ -3,7 +3,13 @@ import type { DailyAccrual, LoanCalculation, LoanInput } from "../types";
 const MS_PER_DAY = 86_400_000;
 export const DAY_COUNT_BASIS = 365;
 export const MAX_LOAN_DAYS = 50 * 366;
+export const MAX_LOAN_AMOUNT = 1_000_000_000_000;
+export const MAX_RATE = 100;
 export const ACCRUAL_PAGE_SIZE = 100;
+
+export function roundCurrency(value: number): number {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
+}
 
 function parseUtcDate(value: string): Date {
   const [year, month, day] = value.split("-").map(Number);
@@ -38,7 +44,23 @@ export function calculateLoan(
   if (numberOfDays > MAX_LOAN_DAYS) {
     throw new Error("Loan period cannot exceed the 50-year processing limit.");
   }
-
+  if (
+    !Number.isFinite(input.amount) ||
+    input.amount <= 0 ||
+    input.amount > MAX_LOAN_AMOUNT
+  ) {
+    throw new Error("Loan amount is outside the supported range.");
+  }
+  if (
+    !Number.isFinite(input.baseRate) ||
+    !Number.isFinite(input.margin) ||
+    input.baseRate < 0 ||
+    input.margin < 0 ||
+    input.baseRate > MAX_RATE ||
+    input.margin > MAX_RATE
+  ) {
+    throw new Error("Interest rates are outside the supported range.");
+  }
   const totalRate = input.baseRate + input.margin;
   const dailyBaseInterest =
     input.amount * (input.baseRate / 100) / DAY_COUNT_BASIS;
@@ -53,7 +75,7 @@ export function calculateLoan(
     numberOfDays,
     dailyBaseInterest,
     dailyAccruedInterest,
-    totalInterest: dailyAccruedInterest * numberOfDays,
+    totalInterest: roundCurrency(dailyAccruedInterest * numberOfDays),
   };
 }
 
@@ -74,12 +96,27 @@ export function getAccrualPage(
 
   for (let index = startIndex; index < endIndex; index += 1) {
     const accrualDate = new Date(start.getTime() + index * MS_PER_DAY);
+    const previousBaseTotal = roundCurrency(
+      calculation.dailyBaseInterest * index,
+    );
+    const currentBaseTotal = roundCurrency(
+      calculation.dailyBaseInterest * (index + 1),
+    );
+    const previousAccruedTotal = roundCurrency(
+      calculation.dailyAccruedInterest * index,
+    );
+    const currentAccruedTotal = roundCurrency(
+      calculation.dailyAccruedInterest * (index + 1),
+    );
+
     rows.push({
       date: toIsoDate(accrualDate),
       daysElapsed: index,
-      baseInterest: calculation.dailyBaseInterest,
-      accruedInterest: calculation.dailyAccruedInterest,
-      runningTotal: calculation.dailyAccruedInterest * (index + 1),
+      baseInterest: roundCurrency(currentBaseTotal - previousBaseTotal),
+      accruedInterest: roundCurrency(
+        currentAccruedTotal - previousAccruedTotal,
+      ),
+      runningTotal: currentAccruedTotal,
     });
   }
 

@@ -5,6 +5,7 @@ import {
   getAccrualPage,
   getNumberOfDays,
   MAX_LOAN_DAYS,
+  roundCurrency,
 } from "./calculations";
 
 const input = {
@@ -58,6 +59,85 @@ describe("calculateLoan", () => {
     expect(rows[9].daysElapsed).toBe(9);
   });
 
+  it("reconciles rounded daily accruals exactly to total interest", () => {
+    const calculation = calculateLoan(
+      { ...input, endDate: "2027-01-01" },
+      "test-id",
+    );
+    const totalPages = Math.ceil(
+      calculation.numberOfDays / ACCRUAL_PAGE_SIZE,
+    );
+    const rows = Array.from({ length: totalPages }, (_, index) =>
+      getAccrualPage(calculation, index + 1),
+    ).flat();
+    const accruedTotal = roundCurrency(
+      rows.reduce((sum, row) => sum + row.accruedInterest, 0),
+    );
+
+    expect(accruedTotal).toBe(calculation.totalInterest);
+    expect(rows.at(-1)?.runningTotal).toBe(calculation.totalInterest);
+  });
+
+  it("returns zero interest when both rates are zero", () => {
+    const calculation = calculateLoan(
+      { ...input, baseRate: 0, margin: 0 },
+      "test-id",
+    );
+    const rows = getAccrualPage(calculation, 1);
+
+    expect(calculation.totalRate).toBe(0);
+    expect(calculation.totalInterest).toBe(0);
+    expect(rows.every((row) => row.accruedInterest === 0)).toBe(true);
+  });
+
+  it("uses actual calendar days across a leap day with a 365-day basis", () => {
+    const calculation = calculateLoan(
+      {
+        ...input,
+        startDate: "2024-02-28",
+        endDate: "2024-03-01",
+        amount: 250_000,
+        baseRate: 5,
+        margin: 0,
+      },
+      "test-id",
+    );
+
+    expect(calculation.numberOfDays).toBe(2);
+    expect(calculation.totalInterest).toBe(
+      roundCurrency(((250_000 * 0.05) / 365) * 2),
+    );
+  });
+
+  it("handles decimal principals and rates at currency precision", () => {
+    const calculation = calculateLoan(
+      {
+        ...input,
+        amount: 1_000.01,
+        baseRate: 3.33,
+        margin: 0.67,
+        endDate: "2026-02-01",
+      },
+      "test-id",
+    );
+    const rows = getAccrualPage(calculation, 1);
+
+    expect(calculation.totalRate).toBe(4);
+    expect(calculation.totalInterest).toBe(
+      roundCurrency(((1_000.01 * 0.04) / 365) * 31),
+    );
+    expect(rows.at(-1)?.runningTotal).toBe(calculation.totalInterest);
+  });
+
+  it("rejects unsupported financial ranges", () => {
+    expect(() =>
+      calculateLoan({ ...input, amount: Number.POSITIVE_INFINITY }, "test-id"),
+    ).toThrow("supported range");
+    expect(() =>
+      calculateLoan({ ...input, baseRate: 101 }, "test-id"),
+    ).toThrow("supported range");
+  });
+
   it("rejects an invalid date range", () => {
     expect(() =>
       calculateLoan({ ...input, endDate: input.startDate }, "test-id"),
@@ -74,6 +154,20 @@ describe("calculateLoan", () => {
     expect(secondPage).toHaveLength(ACCRUAL_PAGE_SIZE);
     expect(secondPage[0].daysElapsed).toBe(100);
     expect(secondPage[99].daysElapsed).toBe(199);
+  });
+
+  it("returns the correct final partial schedule page", () => {
+    const calculation = calculateLoan(
+      { ...input, endDate: "2026-09-08" },
+      "test-id",
+    );
+    const finalPage = getAccrualPage(calculation, 3);
+
+    expect(calculation.numberOfDays).toBe(250);
+    expect(finalPage).toHaveLength(50);
+    expect(finalPage[0].daysElapsed).toBe(200);
+    expect(finalPage.at(-1)?.daysElapsed).toBe(249);
+    expect(finalPage.at(-1)?.runningTotal).toBe(calculation.totalInterest);
   });
 
   it("generates pages within a filtered accrual range", () => {

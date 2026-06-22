@@ -73,21 +73,23 @@ export function CalculationHistory({
                 </div>
               </div>
               <dl className="history-metrics">
-                <div>
-                  <dt>Interest</dt>
-                  <dd>
-                    {formatCurrency(
-                      calculation.totalInterest,
-                      calculation.currency,
-                    )}
-                  </dd>
-                </div>
-                <div>
-                  <dt>Term</dt>
-                  <dd>
-                    {calculation.numberOfDays.toLocaleString("en-GB")} days ·{" "}
-                    {formatRate(calculation.totalRate)} total rate
-                  </dd>
+                <div className="history-metric-row">
+                  <div>
+                    <dt>Interest</dt>
+                    <dd>
+                      {formatCurrency(
+                        calculation.totalInterest,
+                        calculation.currency,
+                      )}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Term</dt>
+                    <dd>
+                      {calculation.numberOfDays.toLocaleString("en-GB")} days ·{" "}
+                      {formatRate(calculation.totalRate)} total rate
+                    </dd>
+                  </div>
                 </div>
                 <small className="history-timestamp">
                   {calculation.updatedAt ? "Last updated" : "Created"}{" "}

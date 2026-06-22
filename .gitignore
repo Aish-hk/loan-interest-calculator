@@ -1,7 +1,45 @@
-node_modules
-dist
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+.vite/
+.cache/
+.output/
+
+# Environment and secrets
+.env
+.env.*
+*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.swp
+
+# Generated TypeScript files
 *.tsbuildinfo
 vite.config.js
 vite.config.d.ts
-.DS_Store
+
+# AI agent and local research/scratch material
 research/
+.codex/
+AGENTS.md
+CLAUDE.md
+.cursor/
+.aider*
+*.scratch.*
+notes.md
+scratch/

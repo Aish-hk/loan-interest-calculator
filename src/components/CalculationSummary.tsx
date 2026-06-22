@@ -179,7 +179,8 @@ export function CalculationSummary({
         <strong>Calculation basis</strong>
         <p>
           Simple interest using a 365-day year. Start date included; end date
-          excluded. No compounding.
+          excluded. No compounding. Daily accruals are allocated to two decimal
+          places so the schedule reconciles exactly to total interest.
         </p>
       </div>
     </section>

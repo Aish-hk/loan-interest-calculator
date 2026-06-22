@@ -4,6 +4,12 @@ A responsive React and TypeScript application that calculates simple loan
 interest, provides a daily accrual schedule, and lets users view or update
 calculations created during the current browser session.
 
+## Live
+
+- GitHub Pages: `https://aish-hk.github.io/loan-interest-calculator/`
+- Cloudflare Pages: connect this repository with build command `npm run build`
+  and output directory `dist`
+
 ## Run locally
 
 ```bash
@@ -24,7 +30,7 @@ npm run build
 - TypeScript for explicit financial data structures
 - Vite for a small, fast development and build setup
 - Vitest for calculation and date-boundary tests
-- React DayPicker for accessible keyboard-navigable range calendars
+- React Aria Components for accessible date fields and calendar interaction
 - Plain CSS for a focused design foundation without UI-library overhead
 
 ## Calculation assumptions
@@ -41,6 +47,9 @@ behaviour. This implementation makes those choices explicit:
 - Total annual rate = base interest rate + margin
 - Daily schedules are generated in pages of 100 records, allowing long-term
   loans without allocating every day in memory
+- Currency totals use two-decimal cumulative rounding. Each daily row is the
+  difference between consecutive rounded cumulative balances, so displayed
+  daily accruals always reconcile exactly to displayed total interest
 - A defensive 50-year processing ceiling prevents pathological browser input;
   30-year loans are fully supported
 
@@ -50,8 +59,9 @@ daily accrued interest = principal × ((base rate + margin) / 100) ÷ 365
 total interest = daily accrued interest × number of days
 ```
 
-Calculations retain full JavaScript numeric precision internally and are rounded
-to two decimal places only for display.
+The nominal daily rate is calculated at full precision. Currency amounts in the
+schedule and total are rounded to two decimals using cumulative allocation,
+which avoids placing the entire rounding remainder on the final day.
 
 ## UX decisions
 
@@ -60,12 +70,10 @@ to two decimal places only for display.
 - Invalid input is described beside the relevant field.
 - Successful calculation moves focus to the result.
 - Daily results use a bounded, horizontally scrollable and paginated table.
-- Accrual dates can be filtered with an inclusive date-range dropdown without
-  materialising the full schedule.
-- Loan and filter dates use a shared range calendar with month/year navigation,
-  keyboard controls and bounded selectable dates.
-- History is deliberately kept in React state because persistence is outside
-  the task requirements.
+- Loan dates use accessible segmented fields and a calendar with month/year
+  navigation, keyboard controls and bounded selectable dates.
+- History uses `sessionStorage`, so it survives refreshes in the same tab and is
+  cleared when that browser-tab session ends.
 - History prioritises principal, period, total rate, duration and total
   interest. A direct calculation creates a new record. Opening a history record
   and recalculating updates that same record, preserving its Created timestamp
@@ -73,9 +81,29 @@ to two decimal places only for display.
 
 ## Possible production extensions
 
-- Configurable ACT/360, ACT/365 and 30/360 conventions
+- Additional jurisdiction-specific financial conventions
 - Decimal arithmetic library or integer minor units for regulated calculations
 - Local or server persistence
 - Pagination or virtualisation for multi-year schedules
 - More currencies and locale selection
 - End-to-end accessibility and interaction tests
+
+## Design system
+
+Foundations, tokens, component definitions and interaction rules are documented
+in [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md).
+End-to-end happy paths, validation, edge cases and acceptance criteria are in
+[`docs/USER_FLOWS.md`](docs/USER_FLOWS.md).
+
+## Deployment
+
+Pushing `main` runs tests, builds the production bundle and deploys it through
+the included GitHub Pages workflow. In repository settings, set
+**Pages → Build and deployment → Source** to **GitHub Actions**.
+
+For Cloudflare Pages, import the same GitHub repository and use:
+
+- Framework preset: Vite
+- Build command: `npm run build`
+- Build output directory: `dist`
+- Node version: 22

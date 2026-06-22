@@ -8,7 +8,9 @@ import { currencies, type LoanFormValues } from "../types";
 import {
   ACCRUAL_PAGE_SIZE,
   getNumberOfDays,
+  MAX_LOAN_AMOUNT,
   MAX_LOAN_DAYS,
+  MAX_RATE,
 } from "../utils/calculations";
 import { FormField } from "./FormField";
 import { DateRangePicker } from "./DateRangePicker";
@@ -76,13 +78,19 @@ function validate(values: LoanFormValues): FormErrors {
   }
   if (!values.amount || !Number.isFinite(amount) || amount <= 0) {
     errors.amount = "Enter an amount greater than zero.";
+  } else if (amount > MAX_LOAN_AMOUNT) {
+    errors.amount = "Enter an amount no greater than 1 trillion.";
   }
   if (!values.currency) errors.currency = "Select a currency.";
   if (values.baseRate === "" || !Number.isFinite(baseRate) || baseRate < 0) {
     errors.baseRate = "Enter a rate of zero or more.";
+  } else if (baseRate > MAX_RATE) {
+    errors.baseRate = "Enter a base rate no greater than 100%.";
   }
   if (values.margin === "" || !Number.isFinite(margin) || margin < 0) {
     errors.margin = "Enter a margin of zero or more.";
+  } else if (margin > MAX_RATE) {
+    errors.margin = "Enter a margin no greater than 100%.";
   }
 
   return errors;
@@ -195,6 +203,7 @@ export function LoanForm({
                 id="amount"
                 type="number"
                 min="0.01"
+                max={MAX_LOAN_AMOUNT}
                 step="0.01"
                 inputMode="decimal"
                 placeholder="100,000"
@@ -265,6 +274,7 @@ export function LoanForm({
                 id="baseRate"
                 type="number"
                 min="0"
+                max={MAX_RATE}
                 step="0.01"
                 inputMode="decimal"
                 placeholder="0.00"
@@ -294,6 +304,7 @@ export function LoanForm({
                 id="margin"
                 type="number"
                 min="0"
+                max={MAX_RATE}
                 step="0.01"
                 inputMode="decimal"
                 placeholder="0.00"

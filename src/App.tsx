@@ -4,6 +4,7 @@ import { CalculationHistory } from "./components/CalculationHistory";
 import { CalculationSummary } from "./components/CalculationSummary";
 import { LoanForm } from "./components/LoanForm";
 import { RotatingCurrencyCoin } from "./components/RotatingCurrencyCoin";
+import anchorBankLogo from "./assets/anchor-bank-logo.png";
 import type {
   Currency,
   LoanCalculation,
@@ -105,20 +106,14 @@ function App() {
   return (
     <>
       <header className="app-header">
-        <div className="brand-logo" aria-hidden="true" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            viewBox="-40 -40 592 592" 
-            fill="white" 
-            width="32" 
-            height="32"
-            style={{ overflow: 'visible' }}
-          >
-            <path d="M304 32c0-44.2-35.8-80-80-80s-80 35.8-80 80c0 40 29.6 73.2 68.3 79.1l0 32.9L144 144c-17.7 0-32 14.3-32 32s14.3 32 32 32l68.3 0 0 168.1C117 353 48 274.6 48 176c0-17.7-14.3-32-32-32S-16 158.3-16 176c0 120.3 84.8 221 198.8 244.3l0 59.7c0 17.7 14.3 32 32 32s32-14.3 32-32l0-59.7C360.2 397 445 296.3 445 176c0-17.7-14.3-32-32-32s-32 14.3-32 32c0 98.6-69 177-164.3 200.1l0-168.1 68.3 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-68.3 0 0-32.9C274.4 105.2 304 72 304 32z"/>
-          </svg>
-          <span style={{ fontFamily: '"Basier Circle", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', fontWeight: 700, fontSize: '20px', color: 'white' }}>
-            Anchor Bank
-          </span>
+        <div className="brand">
+          <img
+            className="brand-logo"
+            src={anchorBankLogo}
+            alt=""
+            aria-hidden="true"
+          />
+          <strong>Anchor Bank</strong>
         </div>
       </header>
 
@@ -126,9 +121,10 @@ function App() {
         <section className="page-intro">
           <div className="intro-copy">
             <span className="eyebrow">Loan calculator</span>
-            <h1>Calculate your loan costs.</h1>
+            <h1>See what your loan costs, day by day.</h1>
             <p>
-              Easily review your daily interest and total loan costs.
+              Calculate simple interest, review daily accruals and revisit
+              previous calculations in one place.
             </p>
           </div>
         </section>
