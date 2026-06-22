@@ -23,6 +23,7 @@ export interface LoanCalculation extends LoanInput {
   id: string;
   createdAt: string;
   updatedAt?: string;
+  updatedFromId?: string;
   totalRate: number;
   numberOfDays: number;
   dailyBaseInterest: number;

@@ -145,9 +145,7 @@ export function LoanForm({
       <div className="section-heading">
         <div>
           <span className="eyebrow">Loan details</span>
-          <h2>
-            {isEditing ? "Create from calculation" : "Create a calculation"}
-          </h2>
+          <h2>{isEditing ? "Edit calculation" : "Create a calculation"}</h2>
         </div>
         {showNewAction && (
           <button
@@ -331,7 +329,7 @@ export function LoanForm({
 
       <div className="form-actions">
         <button className="button primary" type="submit">
-          Calculate interest
+          {isEditing ? "Update calculation" : "Calculate interest"}
           <span aria-hidden="true">→</span>
         </button>
       </div>

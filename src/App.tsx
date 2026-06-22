@@ -65,9 +65,17 @@ function App() {
       openedCalculation.currency !== input.currency ||
       openedCalculation.baseRate !== input.baseRate ||
       openedCalculation.margin !== input.margin;
-    const result = hasChanges
-      ? calculateLoan(input)
-      : openedCalculation;
+    const recalculated = calculateLoan(input);
+    const result =
+      openedCalculation && !hasChanges
+        ? openedCalculation
+        : {
+            ...recalculated,
+            updatedAt: openedCalculation
+              ? new Date().toISOString()
+              : undefined,
+            updatedFromId: openedCalculation?.id,
+          };
 
     if (hasChanges) {
       setCalculations((current) => [result, ...current]);

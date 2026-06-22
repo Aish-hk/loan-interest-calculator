@@ -70,6 +70,11 @@ export function CalculationHistory({
                     {formatRate(calculation.baseRate)} base rate +{" "}
                     {formatRate(calculation.margin)} margin
                   </span>
+                  {calculation.updatedFromId && (
+                    <span className="history-version">
+                      Updated from previous calculation
+                    </span>
+                  )}
                 </div>
               </div>
               <dl className="history-metrics">
@@ -92,20 +97,22 @@ export function CalculationHistory({
                   </div>
                 </div>
                 <small className="history-timestamp">
-                  Created {formatDateTime(calculation.createdAt)}
+                  {calculation.updatedAt ? "Updated" : "Created"}{" "}
+                  {formatDateTime(
+                    calculation.updatedAt ?? calculation.createdAt,
+                  )}
                 </small>
               </dl>
-              {calculation.id !== openedId && (
-                <div className="history-actions">
-                  <button
-                    className="button secondary open-calculation"
-                    type="button"
-                    onClick={() => onOpen(calculation)}
-                  >
-                    Edit
-                  </button>
-                </div>
-              )}
+              <div className="history-actions">
+                <button
+                  className="button secondary open-calculation"
+                  type="button"
+                  onClick={() => onOpen(calculation)}
+                  disabled={calculation.id === openedId}
+                >
+                  {calculation.id === openedId ? "Editing" : "Edit"}
+                </button>
+              </div>
             </article>
           ))}
         </div>

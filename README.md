@@ -74,9 +74,10 @@ which avoids placing the entire rounding remainder on the final day.
 - History uses `sessionStorage`, so it survives refreshes in the same tab and is
   cleared when that browser-tab session ends.
 - History prioritises principal, period, total rate, duration and total
-  interest. Selecting Edit copies a record’s values into the form. A changed
-  scenario is saved as a separate entry; submitting identical values does not
-  create a duplicate or overwrite the original.
+  interest. Selecting Edit loads that record into the form. Saving changed
+  values creates a clearly labelled updated entry while preserving the previous
+  version; unchanged values do not create a duplicate. New calculation creates
+  an unrelated record.
 
 ## Possible production extensions
 
